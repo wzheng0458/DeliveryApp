@@ -19,7 +19,7 @@ import androidx.navigation.NavController
 @Composable
 fun DeliveryInfoUI(
     navController: NavController,
-    viewModel: AddressViewModel,
+    id: String
 ) {
     Column(
         modifier = Modifier
@@ -33,15 +33,22 @@ fun DeliveryInfoUI(
                 .fillMaxWidth()
                 .background(
                     color = Color(android.graphics.Color.parseColor("#ffa500")),
-                    shape = RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp, bottomStart = 160.dp, bottomEnd = 160.dp)
+                    shape = RoundedCornerShape(
+                        topStart = 0.dp,
+                        topEnd = 0.dp,
+                        bottomStart = 160.dp,
+                        bottomEnd = 160.dp
+                    )
                 )
+
         ){
             DateTimePickerDialogComponent()
         }
 
+
         AddressListComponent(
-            navController = navController,
-            viewModel = viewModel,
+            navController = navController, id , addressViewModel = AddressViewModel()
         )
+        //fake customer Id
     }
 }

@@ -18,8 +18,9 @@ import androidx.navigation.compose.rememberNavController
 
 
 @Composable
-fun NavigationController(addressViewModel: AddressViewModel){
+fun NavigationController(addressViewModel: AddressViewModel, customerViewModel: CustomerViewModel){
     val navController = rememberNavController()
+
 
     Scaffold (
         bottomBar = {
@@ -54,16 +55,20 @@ fun NavigationController(addressViewModel: AddressViewModel){
         }
     ) { paddingValues ->
         NavHost(navController = navController,
-            startDestination = Screens.Home.name,
+            startDestination = Screens.MapScreenComponent.name + "/{id}/{address}",
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(route = Screens.Home.name) {
-                Home()
+                Home(navController, customerViewModel)
             }
-            composable(route = Screens.DeliveryInfoUI.name) {
-                DeliveryInfoUI(navController = navController, viewModel = AddressViewModel())
+            composable(route = Screens.DeliveryInfoUI.name + "/{id}") {
+                val id = it.arguments?.getString("id")
+                if (id != null) {
+                    DeliveryInfoUI(navController, id)
+                }
             }
-            composable(route = Screens.MapScreenComponent.name + "/{id}/{address}") {
+
+            composable(route = Screens.MapScreenComponent.name + "/{id}/{address}" ) {
                 val id = it.arguments?.getString("id")?.toInt()
                 val address = it.arguments?.getString("address")
 

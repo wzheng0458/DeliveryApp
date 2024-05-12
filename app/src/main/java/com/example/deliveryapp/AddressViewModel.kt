@@ -1,32 +1,39 @@
 package com.example.deliveryapp
 
-
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.deliveryapp.database.Address
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.time.Instant
+import java.util.Date
 
-class AddressViewModel : ViewModel(){
+class AddressViewModel : ViewModel() {
 
-    private var _addressList = MutableLiveData<List<Address>>()
-    val addressList : LiveData<List<Address>> = _addressList
+    val addressDao = AppApplication.addressDatabase.getAddressDao()
 
-    fun getAllAddress(){
-        _addressList.value = AddressManager.getAllAddress().reversed()
+    fun getListAddressById(customerId: String): LiveData<List<Address>> {
+        return addressDao.getAllAddressById(customerId)
     }
 
-    fun addAddress(address: String){
-        AddressManager.addAddress(address)
-        getAllAddress()
-    }
 
-    fun editAddress(id: Int, newAddress: String) {
-        AddressManager.editAddress(id, newAddress)
-        getAllAddress()
+    fun addAddress(address : String, customerId: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            addressDao.addAddress(Address(address = address, customerId = customerId, createdAt = Date.from(Instant.now())))
+        }
     }
-
+    fun updateAddress(id: Int, address: String, customerId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            addressDao.updateAddress(Address(id = id, address = address, customerId = customerId, createdAt = Date.from(Instant.now())))
+        }
+    }
 
     fun deleteAddress(id : Int){
-        AddressManager.deleteAddress(id)
-        getAllAddress()
+        viewModelScope.launch(Dispatchers.IO) {
+            addressDao.deleteAddress(id)
+        }
     }
+
+
 }
