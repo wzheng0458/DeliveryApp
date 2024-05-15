@@ -1,7 +1,6 @@
 package com.example.deliveryapp
 
-
-
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,20 +32,32 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 
 @Composable
-fun MapScreenComponent(navController: NavController, viewModel: AddressViewModel, id: Int?, address: String?){
+fun MapScreenComponent(navController: NavController, address: String?, customerAddressListViewModel: CustomerAddressListViewModel){
     var addressText by remember { mutableStateOf(address ?: "") }
     var unit by remember { mutableStateOf("") }
     var desc by remember { mutableStateOf("") }
+    var state by remember { mutableStateOf("") }
 
+    val context = LocalContext.current
     var selectedOption by remember { mutableStateOf<Option?>(null) }
     val showDialogSave = remember { mutableStateOf(false) }
     val showDialogDelete = remember { mutableStateOf(false) }
+//    val editAddress = Address(
+//        address = addressText,
+//        meetOption = selectedOption?.name ?: "Meet at door",
+//        unit = unit,
+//        state = state,
+//        desc = desc,
+//        ownerId = address.owner,
+//        createdAt = Date.from(Instant.now())
+//    )
 
     Column(
         Modifier.fillMaxSize(),
@@ -163,10 +174,10 @@ fun MapScreenComponent(navController: NavController, viewModel: AddressViewModel
             )
 
             // Dropdown menu
-            DropDownMenu(
+          state =  DropDownMenu(
                 modifier = Modifier
                     .weight(2.5f)
-            )
+             )
         }
 
         OutlinedTextField(
@@ -178,21 +189,15 @@ fun MapScreenComponent(navController: NavController, viewModel: AddressViewModel
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .height(100.dp)
         )
-
-
-
-
         Button(
             onClick = {
                 showDialogSave.value = true
-
             }) {
             Text("Save the changes")
         }
         Button(
             onClick = {
                 showDialogDelete.value = true
-                navController.navigate(route = Screens.DeliveryInfoUI.name)
             },
             colors = ButtonDefaults.buttonColors(Color.Red)
         ) {
@@ -203,11 +208,9 @@ fun MapScreenComponent(navController: NavController, viewModel: AddressViewModel
                 onDismissRequest = { showDialogSave.value = false },
                 onConfirmation = {
                     showDialogSave.value = false
-                    id?.let {
-
-//                        viewModel.updateAddress(id, addressText, "C001")
-//                        navController.navigate(route = Screens.DeliveryInfoUI.name)
-                    }
+//                    customerAddressListViewModel.editAddress(editAddress)
+                    Toast.makeText(context, "Successfully", Toast.LENGTH_LONG).show()
+                    navController.navigate(route = Screens.DeliveryInfoUI.name + "/${address}")
                 },
                 dialogTitle = "Confirmation",
                 dialogText = "Are you sure?",
@@ -218,12 +221,14 @@ fun MapScreenComponent(navController: NavController, viewModel: AddressViewModel
             AlertDialogBox(
                 onDismissRequest = { showDialogDelete.value = false },
                 onConfirmation = {
-                    showDialogDelete.value = false
-                    id?.let {
+//                    id?.let {
+//                        showDialogDelete.value = false
+//                        customerAddressListViewModel.deleteAddress(id)
+//                        navController.navigate(route = Screens.DeliveryInfoUI.name + "/${id}")
+//                    }
 
-//                        viewModel.deleteAddress(id)
-//                        navController.navigate(route = Screens.DeliveryInfoUI.name)
-                    }
+
+                    Toast.makeText(context, "Successfully", Toast.LENGTH_LONG).show()
                 },
                 dialogTitle = "Confirmation",
                 dialogText = "Are you sure?",
@@ -237,20 +242,16 @@ fun MapScreenComponent(navController: NavController, viewModel: AddressViewModel
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropDownMenu(modifier : Modifier) {
+fun DropDownMenu(modifier : Modifier): String {
 
     var expanded by remember { mutableStateOf(false) }
     val suggestions = listOf("Johor", "Kedah", "Kelantan", "Kuala Lumpur", "Melacca", "Negeri Sembilan", "Pahang", "Perlis", "Penang", "Perak", "Sabah", "Sarawak", "Selangor")
     var selectedText by remember { mutableStateOf(suggestions[0]) }
 
-
-
-
-
     Column(modifier) {
         ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = {expanded = !expanded}) {
             TextField(
-                modifier = Modifier.menuAnchor(),
+                modifier = Modifier.menuAnchor().fillMaxWidth(),
                 value = selectedText,
                 onValueChange = {},
                 readOnly = true,
@@ -270,9 +271,10 @@ fun DropDownMenu(modifier : Modifier) {
             }
         }
     }
+    return selectedText
 }
-enum class Option {
-    MEET_AT_DOOR,
-    LEAVE_AT_DOOR,
-    MEET_OUTSIDE
+enum class Option(val optionString: String) {
+    MEET_AT_DOOR("Meet at door"),
+    LEAVE_AT_DOOR("Leave at door"),
+    MEET_OUTSIDE("Meet outside")
 }

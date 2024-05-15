@@ -18,10 +18,8 @@ import androidx.navigation.compose.rememberNavController
 
 
 @Composable
-fun NavigationController(addressViewModel: AddressViewModel, customerViewModel: CustomerViewModel){
+fun NavigationController(customerAddressListViewModel: CustomerAddressListViewModel){
     val navController = rememberNavController()
-
-
     Scaffold (
         bottomBar = {
             NavigationBar {
@@ -55,24 +53,26 @@ fun NavigationController(addressViewModel: AddressViewModel, customerViewModel: 
         }
     ) { paddingValues ->
         NavHost(navController = navController,
-            startDestination = Screens.MapScreenComponent.name + "/{id}/{address}",
+            startDestination = Screens.Home.name,
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(route = Screens.Home.name) {
-                Home(navController, customerViewModel)
+                Home(navController)
             }
-            composable(route = Screens.DeliveryInfoUI.name + "/{id}") {
+            composable(route = Screens.DeliveryInfoUI.name + "/{id}" ) {
                 val id = it.arguments?.getString("id")
-                if (id != null) {
-                    DeliveryInfoUI(navController, id)
-                }
+                DeliveryInfoUI(navController, customerAddressListViewModel, id)
+
             }
 
-            composable(route = Screens.MapScreenComponent.name + "/{id}/{address}" ) {
-                val id = it.arguments?.getString("id")?.toInt()
-                val address = it.arguments?.getString("address")
+            composable(route = Screens.MapScreenComponent.name + "/{address}") {
+                val id = it.arguments?.getStringArrayList("address")
 
-                MapScreenComponent(navController, addressViewModel, id, address)
+//                MapScreenComponent(navController, , customerAddressListViewModel)
+            }
+            composable(route = Screens.CreateNewAddressScreen.name + "/{id}") {
+                val id = it.arguments?.getString("id")
+                CreateNewAddressScreen(navController, customerAddressListViewModel, id)
             }
 
         }

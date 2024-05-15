@@ -1,12 +1,10 @@
 package com.example.deliveryapp
 
-import android.media.Image
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
-
 
 data class NavItem(
     val label: String,
