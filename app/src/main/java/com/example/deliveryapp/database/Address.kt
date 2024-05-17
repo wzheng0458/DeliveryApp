@@ -6,7 +6,7 @@ import java.util.Date
 
 
 @Entity(
-    tableName = "Address",
+    tableName = "Address"
 )
 data class Address(
     @PrimaryKey(autoGenerate = true)
@@ -17,8 +17,7 @@ data class Address(
     val state: String,
     val desc: String,
     var ownerId: String,
-    val createdAt: Date,
-
-    )
+    val createdAt: Date
+)
 
 

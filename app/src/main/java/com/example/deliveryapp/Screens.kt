@@ -4,5 +4,6 @@ enum class Screens {
     Home,
     DeliveryInfoUI,
     MapScreenComponent,
-    CreateNewAddressScreen
+    CreateNewAddressScreen,
+    DeliveryRecord
 }

@@ -18,8 +18,12 @@ import androidx.navigation.compose.rememberNavController
 
 
 @Composable
-fun NavigationController(customerAddressListViewModel: CustomerAddressListViewModel){
+fun NavigationController(){
     val navController = rememberNavController()
+    val addressViewModel = AddressViewModel()
+    val customerViewModel = CustomerViewModel()
+    val confirmDeliveryOrderViewModel = ConfirmDeliveryOrderViewModel()
+
     Scaffold (
         bottomBar = {
             NavigationBar {
@@ -57,22 +61,27 @@ fun NavigationController(customerAddressListViewModel: CustomerAddressListViewMo
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(route = Screens.Home.name) {
-                Home(navController)
+                Home(navController, customerViewModel)
             }
             composable(route = Screens.DeliveryInfoUI.name + "/{id}" ) {
                 val id = it.arguments?.getString("id")
-                DeliveryInfoUI(navController, customerAddressListViewModel, id)
+
+                DeliveryInfoUI(navController, addressViewModel, confirmDeliveryOrderViewModel, id)
 
             }
 
-            composable(route = Screens.MapScreenComponent.name + "/{address}") {
-                val id = it.arguments?.getStringArrayList("address")
-
-//                MapScreenComponent(navController, , customerAddressListViewModel)
+            composable(route = Screens.MapScreenComponent.name + "/{id}" + "/{custId}") {
+                val id = it.arguments?.getString("id")?.toInt()
+                val custId = it.arguments?.getString("custId")
+                MapScreenComponent(navController, addressViewModel, id, custId)
             }
             composable(route = Screens.CreateNewAddressScreen.name + "/{id}") {
                 val id = it.arguments?.getString("id")
-                CreateNewAddressScreen(navController, customerAddressListViewModel, id)
+                CreateNewAddressScreen(navController, addressViewModel, id)
+            }
+            composable(route = Screens.DeliveryRecord.name + "/{id}" ) {
+                val id = it.arguments?.getString("id")
+                DeliveryRecord(confirmDeliveryOrderViewModel, id)
             }
 
         }

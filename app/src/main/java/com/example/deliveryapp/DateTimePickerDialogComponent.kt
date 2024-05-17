@@ -1,12 +1,15 @@
 package com.example.deliveryapp
 
 import android.app.TimePickerDialog
+import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -16,7 +19,6 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -29,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -37,13 +38,18 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DateTimePickerDialogComponent() {
+fun DateTimePickerDialogComponent(
+    onDateSelected: (String) -> Unit,
+    onTimeSelected: (String) -> Unit
+){
+    val currentDate = Calendar.getInstance().apply { timeInMillis = System.currentTimeMillis() }
+    val maxDate = Calendar.getInstance().apply { add(Calendar.DATE, 3) }
     // Initial state setup for the DatePickerDialog. Specifies to show the picker initially
     val datePickerState = rememberDatePickerState(initialDisplayMode = DisplayMode.Picker)
     // State to hold the selected date as a String
     val selectedDateLabel = remember { mutableStateOf("") }
     // State to control the visibility of the DatePickerDialog
-    val openDialog = remember { mutableStateOf(false) }
+    val openDateDialog = remember { mutableStateOf(false) }
     // Define the main color for the calendar picker
     val calendarPickerMainColor = Color(0xFF722276)
     val cal = Calendar.getInstance()
@@ -56,92 +62,107 @@ fun DateTimePickerDialogComponent() {
     }
     val timePickerDialog = TimePickerDialog(
         context,{ t, hoursOfDay, minutes ->
-            time = "$hoursOfDay: $minutes"
+            val selectedTime = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, hoursOfDay)
+                set(Calendar.MINUTE, minutes)
+            }
+
+            if (selectedTime.after(currentDate) && selectedTime.before(maxDate)) {
+                time = String.format("%02d:%02d", hoursOfDay, minutes)
+                onTimeSelected(time)
+            } else {
+                time = ""
+                Toast.makeText(context, "Invalid time input", Toast.LENGTH_LONG).show()
+            }
         }, hour, minute, false
     )
-    Card (
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(18.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFA500))
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "When?",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
-    ){
-        Column(
+        Card(
             modifier = Modifier
-                .padding(8.dp),
-            ) {
-            // Button to open the DatePickerDialog
-            Text(
-                text = "When ?",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+                .clickable { openDateDialog.value = true },
+            shape = RoundedCornerShape(8.dp),
+            elevation = CardDefaults.cardElevation(18.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFA500))
+        ) {
             Row(
-
+                modifier = Modifier.padding(16.dp)
             ) {
-                IconButton(onClick = {
-                    openDialog.value = !openDialog.value
-                }) {
-                    Icon(imageVector = Icons.Default.DateRange , contentDescription = "Date Picker")
-                }
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = "Date Picker"
+                )
                 Text(
-                    text ="Date: ${selectedDateLabel.value}"
+                    text = "Date: ${selectedDateLabel.value}",
+                    modifier = Modifier.padding(start = 8.dp)
                 )
             }
-            Row {
-                IconButton(onClick = {
-                    timePickerDialog.show()
-                }) {
-                    Icon(painter = painterResource(R.drawable.ic_clock), contentDescription = "Time Picker")
-                }
-
-                Text(
-                    text ="Time: ${time}"
-                )
-            }
-
-
         }
 
-        // Conditional display of the DatePickerDialog based on the openDialog state
-        if (openDialog.value) {
-            // DatePickerDialog component with custom colors and button behaviors
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+                .clickable { timePickerDialog.show() },
+            shape = RoundedCornerShape(8.dp),
+            elevation = CardDefaults.cardElevation(18.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFA500))
+        ) {
+            Row(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.AccessTime,
+                    contentDescription = "Time Picker"
+                )
+                Text(
+                    text = "Time: ${time}",
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+        }
+
+        if (openDateDialog.value) {
             DatePickerDialog(
                 colors = DatePickerDefaults.colors(
                     containerColor = Color(0xFFF5F0FF),
                 ),
                 onDismissRequest = {
-                    // Action when the dialog is dismissed without selecting a date
-                    openDialog.value = false
+                    openDateDialog.value = false
                 },
                 confirmButton = {
-                    // Confirm button with custom action and styling
                     TextButton(
                         onClick = {
-                            // Action to set the selected date and close the dialog
-                            openDialog.value = false
+                            openDateDialog.value = false
                             selectedDateLabel.value =
                                 datePickerState.selectedDateMillis?.convertMillisToDate() ?: ""
+                            onDateSelected(selectedDateLabel.value)
                         }
                     ) {
                         Text("OK", color = calendarPickerMainColor)
                     }
                 },
                 dismissButton = {
-                    // Dismiss button to close the dialog without selecting a date
                     TextButton(
                         onClick = {
-                            openDialog.value = false
+                            openDateDialog.value = false
                         }
                     ) {
                         Text("CANCEL", color = calendarPickerMainColor)
                     }
                 }
             ) {
-                // The actual DatePicker component within the dialog
                 DatePicker(
                     state = datePickerState,
                     colors = DatePickerDefaults.colors(
@@ -151,13 +172,13 @@ fun DateTimePickerDialogComponent() {
                         selectedYearContentColor = Color.White,
                         todayContentColor = calendarPickerMainColor,
                         todayDateBorderColor = calendarPickerMainColor
-                    )
+                    ),
+
+
                 )
             }
         }
     }
-    // Layout for displaying the button and the selected date
-
 }
 
 fun Long.convertMillisToDate(): String {
@@ -170,6 +191,6 @@ fun Long.convertMillisToDate(): String {
         add(Calendar.MILLISECOND, -(zoneOffset + dstOffset))
     }
     // Format the calendar time in the specified format
-    val sdf = SimpleDateFormat("dd MMM yyyy,", Locale.US)
+    val sdf = SimpleDateFormat("dd MMM yyyy", Locale.US)
     return sdf.format(calendar.time)
 }

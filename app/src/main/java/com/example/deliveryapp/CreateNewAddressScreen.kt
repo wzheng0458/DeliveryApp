@@ -33,13 +33,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.deliveryapp.database.Address
-import java.time.Instant
-import java.util.Date
 
 
 @Composable
-fun CreateNewAddressScreen(navController: NavController, customerAddressListViewModel: CustomerAddressListViewModel, ownerId: String?) {
+fun CreateNewAddressScreen(navController: NavController, addressViewModel: AddressViewModel, ownerId: String?) {
     var addressText by remember { mutableStateOf( "") }
     var unit by remember { mutableStateOf("") }
     var desc by remember { mutableStateOf("") }
@@ -48,15 +45,7 @@ fun CreateNewAddressScreen(navController: NavController, customerAddressListView
     var selectedOption by remember { mutableStateOf<Option?>(null) }
     val showDialogSave = remember { mutableStateOf(false) }
     val showDialogDelete = remember { mutableStateOf(false) }
-    val newAddress = Address(
-        address = addressText,
-        meetOption = selectedOption?.name ?: "MEET_AT_DOOR",
-        unit = unit,
-        state = state,
-        desc = desc,
-        ownerId = ownerId?: "",
-        createdAt = Date.from(Instant.now())
-    )
+
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -117,7 +106,7 @@ fun CreateNewAddressScreen(navController: NavController, customerAddressListView
                                 )
                             }
                         }
-                        Text("Leave at door", style = MaterialTheme.typography.labelSmall)
+                        Text("Meet at door", style = MaterialTheme.typography.labelSmall)
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Box(
@@ -168,29 +157,34 @@ fun CreateNewAddressScreen(navController: NavController, customerAddressListView
                                 )
                             }
                         }
-                        Text("Leave at door", style = MaterialTheme.typography.labelSmall )
+                        Text("Meet Outside", style = MaterialTheme.typography.labelSmall )
                     }
                 }
-                // Unit text field
-                OutlinedTextField(
-                    value = unit,
-                    onValueChange = { unit = it },
-                    label = { Text("Unit/Floor") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                )
-                state = DropDownMenu(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // Unit text field
+                    OutlinedTextField(
+                        value = unit,
+                        onValueChange = { unit = it },
+                        label = { Text("Unit/Floor") },
+                        modifier = Modifier
+                            .weight(1.5f) // Occupies one-third of the width
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                    state = dropDownMenu(
+                        modifier = Modifier
+                            .weight(2.5f)
+                    )
+                }
+
 
                 // Description text field
                 OutlinedTextField(
                     value = desc,
                     onValueChange = { desc = it },
-                    label = { Text("Description") },
+                    label = { Text("Description(optional)") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
@@ -204,9 +198,24 @@ fun CreateNewAddressScreen(navController: NavController, customerAddressListView
                         .padding(top = 16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
+                    val isButtonEnabled = if (addressText.isNotEmpty()  && unit.isNotEmpty() && state.isNotEmpty() && selectedOption != null) {
+                        true
+                    } else {
+                        false
+                    }
+
                     Button(
                         onClick = {
                             showDialogSave.value = true
+                        },
+                        enabled = isButtonEnabled,
+                        colors = if (isButtonEnabled) {
+                            ButtonDefaults.buttonColors()
+                        } else {
+                            ButtonDefaults.buttonColors(
+                                containerColor = Color.Gray.copy(alpha = 0.5f),
+                                contentColor = Color.White.copy(alpha = 0.5f)
+                            )
                         }
                     ) {
                         Text("Create")
@@ -230,7 +239,13 @@ fun CreateNewAddressScreen(navController: NavController, customerAddressListView
                         onConfirmation = {
                             showDialogSave.value = false
                             navController.navigate(route = Screens.DeliveryInfoUI.name + "/${ownerId}")
-                            customerAddressListViewModel.addAddress(newAddress)
+                            addressViewModel.addAddress(address = addressText,
+                                meetOption = selectedOption?.name ?: "MEET_AT_DOOR",
+                                unit = unit,
+                                state = state,
+                                desc = desc,
+                                customerId = ownerId?: ""
+                            )
                             Toast.makeText(context, "Successfully", Toast.LENGTH_LONG).show()
                         },
                         dialogTitle = "Confirmation",

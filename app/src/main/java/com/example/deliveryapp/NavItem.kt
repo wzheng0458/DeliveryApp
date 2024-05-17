@@ -2,8 +2,8 @@ package com.example.deliveryapp
 
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeliveryDining
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.ui.graphics.vector.ImageVector
 
 data class NavItem(
@@ -20,8 +20,8 @@ val listOfNavItems: List<NavItem> = listOf(
     ),
     NavItem(
         label = "DeliveryInfoUI",
-        icon = Icons.Filled.LocationOn,
-        route = Screens.DeliveryInfoUI.name,
+        icon = Icons.Filled.DeliveryDining,
+        route = Screens.DeliveryInfoUI.name + "/{id}",
     ),
 //    NavItem(
 //        label = "MapScreenComponent",

@@ -67,6 +67,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("androidx.compose.material:material-icons-extended-android:1.6.7")
     implementation("androidx.compose.runtime:runtime-livedata:1.6.6")
     val nav_version = "2.7.7"
 
@@ -79,13 +80,6 @@ dependencies {
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:$room_version")
 
-
-
-
-
-
-
-
-
+    implementation( "androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
 
 }

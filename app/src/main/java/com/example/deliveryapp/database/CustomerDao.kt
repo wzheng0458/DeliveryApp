@@ -4,23 +4,18 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Transaction
 
-//@Dao
-//interface CustomerDao {
+@Dao
+interface CustomerDao {
+    @Insert
+    fun insertCustomer(customer: Customer)
+
 //    @Insert
-//    fun insertCustomer(customer: Customer)
-//
-////    @Insert
-////    suspend fun insertAddress(address: Address)
-//
-//    @Transaction
-//    @Query("SELECT * FROM Customer")
-//    fun getCustomersWithAddresses(): LiveData<List<Customer>>
-//
-//    @Transaction
-//    @Query("SELECT * FROM Customer WHERE customerId = :customerId")
-//    fun getCustomerWithAddressesById(customerId: String): LiveData<Customer>
-//
-//
-//}
+//    suspend fun insertAddress(address: Address)
+
+
+    @Query("SELECT * FROM Customer WHERE customerId = :customerId")
+    fun getCustomerById(customerId: String): LiveData<Customer>
+
+
+}

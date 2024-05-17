@@ -10,10 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -25,7 +28,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,8 +44,10 @@ import androidx.navigation.NavController
 
 
 @Composable
-fun MapScreenComponent(navController: NavController, address: String?, customerAddressListViewModel: CustomerAddressListViewModel){
-    var addressText by remember { mutableStateOf(address ?: "") }
+fun MapScreenComponent(navController: NavController, addressViewModel: AddressViewModel, id: Int?, customerId: String?){
+    val editAddress by addressViewModel.getAddress(id ?: -1).observeAsState()
+
+    var addressText by remember { mutableStateOf("") }
     var unit by remember { mutableStateOf("") }
     var desc by remember { mutableStateOf("") }
     var state by remember { mutableStateOf("") }
@@ -49,192 +56,261 @@ fun MapScreenComponent(navController: NavController, address: String?, customerA
     var selectedOption by remember { mutableStateOf<Option?>(null) }
     val showDialogSave = remember { mutableStateOf(false) }
     val showDialogDelete = remember { mutableStateOf(false) }
-//    val editAddress = Address(
-//        address = addressText,
-//        meetOption = selectedOption?.name ?: "Meet at door",
-//        unit = unit,
-//        state = state,
-//        desc = desc,
-//        ownerId = address.owner,
-//        createdAt = Date.from(Instant.now())
-//    )
 
-    Column(
-        Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    // Utility function to map string to Option enum
+    fun getOptionFromString(optionString: String?): Option? {
+        return when (optionString) {
+            Option.MEET_AT_DOOR.optionString -> Option.MEET_AT_DOOR
+            Option.LEAVE_AT_DOOR.optionString -> Option.LEAVE_AT_DOOR
+            Option.MEET_OUTSIDE.optionString -> Option.MEET_OUTSIDE
+            else -> null
+        }
+    }
+
+    // Initialize values when editAddress is loaded
+    LaunchedEffect(editAddress) {
+        editAddress?.let {
+            addressText = it.address
+            unit = it.unit
+            desc = it.desc
+            state = it.state
+            selectedOption = getOptionFromString(it.meetOption)
+        }
+    }
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "Let us know your location",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(16.dp)
-        )
-        OutlinedTextField(
-            value = addressText,
-            onValueChange = { addressText = it },
-            label = { Text("New Address") },
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-        )
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
-        ) {
+                .padding(16.dp),
+            shape = RoundedCornerShape(2.dp),
+            elevation = CardDefaults.cardElevation(18.dp),
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
-                    modifier = Modifier
-                        .background(
-                            if (selectedOption == Option.MEET_AT_DOOR) MaterialTheme.colorScheme.primary.copy(
-                                alpha = 0.2f
-                            ) else Color.Transparent
-                        )
-                        .padding(4.dp)
-                ) {
-                    IconToggleButton(
-                        checked = selectedOption == Option.MEET_AT_DOOR,
-                        onCheckedChange = {
-                            selectedOption = if (it) Option.MEET_AT_DOOR else null
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_dooropen),
-                            contentDescription = "Meet at door",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-                Text("Leave at door", style = MaterialTheme.typography.labelSmall)
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
-                    modifier = Modifier
-                        .background(
-                            if (selectedOption == Option.LEAVE_AT_DOOR) MaterialTheme.colorScheme.primary.copy(
-                                alpha = 0.2f
-                            ) else Color.Transparent
-                        )
-                        .padding(4.dp)
-                ) {
-                    IconToggleButton(
-                        checked = selectedOption == Option.LEAVE_AT_DOOR,
-                        onCheckedChange = {
-                            selectedOption = if (it) Option.LEAVE_AT_DOOR else null
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_doorclose),
-                            contentDescription = "Leave at door",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-                Text("Leave at door", style = MaterialTheme.typography.labelSmall)
-            }
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
-                    modifier = Modifier
-                        .background(
-                            if (selectedOption == Option.MEET_OUTSIDE) MaterialTheme.colorScheme.primary.copy(
-                                alpha = 0.2f
-                            ) else Color.Transparent
-                        )
-                        .padding(4.dp)
-                ) {
-                    IconToggleButton(
-                        checked = selectedOption == Option.MEET_OUTSIDE,
-                        onCheckedChange = {
-                            selectedOption = if (it) Option.MEET_OUTSIDE else null
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_outside),
-                            contentDescription = "Meet Outside",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-                Text("Leave at door", style = MaterialTheme.typography.labelSmall )
-            }
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            // Unit text field
-            OutlinedTextField(
-                value = unit,
-                onValueChange = { unit = it },
-                label = { Text("Unit/Floor") },
+            ) {
+            Column(
                 modifier = Modifier
-                    .weight(1.5f) // Occupies one-third of the width
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            )
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center
 
-            // Dropdown menu
-          state =  DropDownMenu(
-                modifier = Modifier
-                    .weight(2.5f)
-             )
-        }
+            ) {
+                Text(
+                    text = "Update your location",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(16.dp)
+                )
+                OutlinedTextField(
+                    value = addressText,
+                    onValueChange = { addressText = it },
+                    label = { Text("New Address") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
 
-        OutlinedTextField(
-            value = desc,
-            onValueChange = { desc = it },
-            label = { Text("Description") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .height(100.dp)
-        )
-        Button(
-            onClick = {
-                showDialogSave.value = true
-            }) {
-            Text("Save the changes")
-        }
-        Button(
-            onClick = {
-                showDialogDelete.value = true
-            },
-            colors = ButtonDefaults.buttonColors(Color.Red)
-        ) {
-            Text("Delete")
-        }
-        if (showDialogSave.value) {
-            AlertDialogBox(
-                onDismissRequest = { showDialogSave.value = false },
-                onConfirmation = {
-                    showDialogSave.value = false
-//                    customerAddressListViewModel.editAddress(editAddress)
-                    Toast.makeText(context, "Successfully", Toast.LENGTH_LONG).show()
-                    navController.navigate(route = Screens.DeliveryInfoUI.name + "/${address}")
-                },
-                dialogTitle = "Confirmation",
-                dialogText = "Are you sure?",
-                dialogIcon = Icons.Default.Person
-            )
-        }
-        if(showDialogDelete.value){
-            AlertDialogBox(
-                onDismissRequest = { showDialogDelete.value = false },
-                onConfirmation = {
-//                    id?.let {
-//                        showDialogDelete.value = false
-//                        customerAddressListViewModel.deleteAddress(id)
-//                        navController.navigate(route = Screens.DeliveryInfoUI.name + "/${id}")
-//                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    if (selectedOption == Option.MEET_AT_DOOR) MaterialTheme.colorScheme.primary.copy(
+                                        alpha = 0.2f
+                                    ) else Color.Transparent
+                                )
+                                .padding(4.dp)
+                        ) {
+                            IconToggleButton(
+                                checked = selectedOption == Option.MEET_AT_DOOR,
+                                onCheckedChange = {
+                                    selectedOption = if (it) Option.MEET_AT_DOOR else null
+                                }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_dooropen),
+                                    contentDescription = "Meet at door",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                        Text("Meet at door", style = MaterialTheme.typography.labelSmall)
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    if (selectedOption == Option.LEAVE_AT_DOOR) MaterialTheme.colorScheme.primary.copy(
+                                        alpha = 0.2f
+                                    ) else Color.Transparent
+                                )
+                                .padding(4.dp)
+                        ) {
+                            IconToggleButton(
+                                checked = selectedOption == Option.LEAVE_AT_DOOR,
+                                onCheckedChange = {
+                                    selectedOption = if (it) Option.LEAVE_AT_DOOR else null
+                                }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_doorclose),
+                                    contentDescription = "Leave at door",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                        Text("Leave at door", style = MaterialTheme.typography.labelSmall)
+                    }
+
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    if (selectedOption == Option.MEET_OUTSIDE) MaterialTheme.colorScheme.primary.copy(
+                                        alpha = 0.2f
+                                    ) else Color.Transparent
+                                )
+                                .padding(4.dp)
+                        ) {
+                            IconToggleButton(
+                                checked = selectedOption == Option.MEET_OUTSIDE,
+                                onCheckedChange = {
+                                    selectedOption = if (it) Option.MEET_OUTSIDE else null
+                                }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_outside),
+                                    contentDescription = "Meet Outside",
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                        Text("Meet Outside", style = MaterialTheme.typography.labelSmall )
+                    }
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // Unit text field
+                    OutlinedTextField(
+                        value = unit,
+                        onValueChange = { unit = it },
+                        label = { Text("Unit/Floor") },
+                        modifier = Modifier
+                            .weight(1.5f) // Occupies one-third of the width
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+
+                    // Dropdown menu
+                    state = dropDownMenu(
+                        modifier = Modifier
+                            .weight(2.5f)
+                    )
+                }
+
+                OutlinedTextField(
+                    value = desc,
+                    onValueChange = { desc = it },
+                    label = { Text("Description(optional)") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .height(100.dp)
+                )
+                // Buttons
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    val isButtonEnabled = if (addressText.isNotEmpty() && unit.isNotEmpty() && state.isNotEmpty() && selectedOption != null) {
+                        true
+                    } else {
+                        false
+                    }
+                    Button(
+                        onClick = {
+                            showDialogSave.value = true
+                        },
+                        enabled = isButtonEnabled,
+                        colors = if (isButtonEnabled) {
+                            ButtonDefaults.buttonColors()
+                        } else {
+                            ButtonDefaults.buttonColors(
+                                containerColor = Color.Gray.copy(alpha = 0.5f),
+                                contentColor = Color.White.copy(alpha = 0.5f)
+                            )
+                        }
+                    ) {
+                        Text("Save the changes")
+                    }
+
+                    Button(
+                        onClick = {
+                            showDialogDelete.value = true
+                        },
+                        colors = ButtonDefaults.buttonColors(Color.Red)
+                    ) {
+                        Text("Delete")
+                    }
+                }
+                if (showDialogSave.value) {
+                    AlertDialogBox(
+                        onDismissRequest = { showDialogSave.value = false },
+                        onConfirmation = {
+                            id?.let {
+                                customerId?.let {
+                                    showDialogSave.value = false
+                                    addressViewModel.updateAddress(
+                                        id = id,
+                                        address = addressText,
+                                        meetOption = selectedOption.toString(),
+                                        unit = unit,
+                                        state = state,
+                                        desc = desc,
+                                        ownerId = customerId
+                                    )
+                                    Toast.makeText(context, "Successfully", Toast.LENGTH_LONG).show()
+                                    navController.navigate(route = Screens.DeliveryInfoUI.name + "/${customerId}")
+                                }
+
+                            } ?: Toast.makeText(context, "UnSuccessfully", Toast.LENGTH_LONG).show()
+
+                        },
+                        dialogTitle = "Confirmation",
+                        dialogText = "Are you sure?",
+                        dialogIcon = Icons.Default.Person
+                    )
+                }
+                if (showDialogDelete.value) {
+                    AlertDialogBox(
+                        onDismissRequest = { showDialogDelete.value = false },
+                        onConfirmation = {
+                            id?.let {
+                                customerId?.let {
+                                    showDialogDelete.value = false
+                                    addressViewModel.deleteAddress(id)
+                                    Toast.makeText(context, "Successfully", Toast.LENGTH_LONG)
+                                        .show()
+                                    navController.navigate(route = Screens.DeliveryInfoUI.name + "/${customerId}")
+                                }
+
+                            } ?: Toast.makeText(context, "UnSuccessfully", Toast.LENGTH_LONG).show()
 
 
-                    Toast.makeText(context, "Successfully", Toast.LENGTH_LONG).show()
-                },
-                dialogTitle = "Confirmation",
-                dialogText = "Are you sure?",
-                dialogIcon = Icons.Default.Person
-            )
+                        },
+                        dialogTitle = "Confirmation",
+                        dialogText = "Are you sure?",
+                        dialogIcon = Icons.Default.Person
+                    )
 
+                }
+            }
         }
     }
 
@@ -242,7 +318,7 @@ fun MapScreenComponent(navController: NavController, address: String?, customerA
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropDownMenu(modifier : Modifier): String {
+fun dropDownMenu(modifier : Modifier): String {
 
     var expanded by remember { mutableStateOf(false) }
     val suggestions = listOf("Johor", "Kedah", "Kelantan", "Kuala Lumpur", "Melacca", "Negeri Sembilan", "Pahang", "Perlis", "Penang", "Perak", "Sabah", "Sarawak", "Selangor")
@@ -251,7 +327,9 @@ fun DropDownMenu(modifier : Modifier): String {
     Column(modifier) {
         ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = {expanded = !expanded}) {
             TextField(
-                modifier = Modifier.menuAnchor().fillMaxWidth(),
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth(),
                 value = selectedText,
                 onValueChange = {},
                 readOnly = true,
