@@ -209,31 +209,13 @@ fun AddressItem(
             ) {
                 Text(
                     text = "Address: ${item.address}",
-                    fontSize = 16.sp,
+                    fontSize = 6.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
 
-                    ){
-                    Text(
-                        text = "Address: ${item.unit}",
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.weight(1f)
 
-                    )
-                    Text(
-                        text = "Address: ${item.state}",
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
             }
+
             Row(
                 horizontalArrangement = Arrangement.End,
                 modifier = Modifier
