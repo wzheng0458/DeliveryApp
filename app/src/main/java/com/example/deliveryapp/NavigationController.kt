@@ -1,5 +1,6 @@
 package com.example.deliveryapp
 
+import ViewAccountScreen
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -8,9 +9,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -26,21 +24,18 @@ import com.example.deliveryapp.delivery.CreateNewAddressScreen
 import com.example.deliveryapp.delivery.DeliveryInfoUI
 import com.example.deliveryapp.delivery.DeliveryRecord
 import com.example.deliveryapp.delivery.MapScreenComponent
-import com.example.deliveryapp.login.AccountViewModel
-import com.example.deliveryapp.login.AddAccountScreen
 import com.example.deliveryapp.login.CustomerMainScreen
 import com.example.deliveryapp.login.LoginMainScreen
 import com.example.deliveryapp.login.LoginViewModel
-import com.example.deliveryapp.login.ViewAccountScreen
-import com.example.deliveryapp.logindatabase.AccountState
 import com.example.deliveryapp.order.Bill
 import com.example.deliveryapp.order.CartView
 import com.example.deliveryapp.order.Order
 import com.example.deliveryapp.order.OrderMenu
 import com.example.deliveryapp.orderdatabase.CartViewModel
-//import com.example.deliveryapp.orderdatabase.OrderViewModel
+import com.example.deliveryapp.orderdatabase.OrderViewModel
 import com.example.loginapp.RegisterScreen
 import com.example.loginapp.StaffMainScreen
+import com.example.loginapp.ui.theme.AccountViewModel
 import com.example.loginapp.ui.theme.RegisterViewModel
 
 
@@ -51,8 +46,7 @@ fun NavigationController(){
     val addressViewModel = AddressViewModel()
     val confirmDeliveryOrderViewModel = ConfirmDeliveryOrderViewModel()
     val cartViewModel = viewModel<CartViewModel>()
-
-//    val orderViewModel = viewModel<OrderViewModel>()
+    val orderViewModel = viewModel<OrderViewModel>()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     Scaffold (
@@ -119,13 +113,11 @@ fun NavigationController(){
             }
 
             composable(route = Screens.ViewAccountScreen.name) {
-                val viewModel: AccountViewModel = viewModel()
-                ViewAccountScreen(navController = navController, onEvent = viewModel::onEvent, state = AccountState(), viewModel = viewModel)
+                val id = it.arguments?.getString("id")
+
+                ViewAccountScreen(navController = navController,  viewModel = viewModel(AccountViewModel::class.java))
             }
-            composable(route = Screens.AddAccountScreen.name) {
-                val viewModel: AccountViewModel = viewModel()
-                AddAccountScreen(navController = navController, onEvent = viewModel::onEvent, state = AccountState(), viewModel = viewModel)
-            }
+
 
             //login module end
 
@@ -203,7 +195,7 @@ fun NavigationController(){
                 val id = it.arguments?.getString("id") ?: ""
                 var isDeliveryOrder = it.arguments?.getString("isDeliveryOrder")?.toInt()
 
-                Bill(cartViewModel, navController, id, confirmDeliveryOrderViewModel, isDeliveryOrder)
+                Bill(cartViewModel, navController, orderViewModel ,id, confirmDeliveryOrderViewModel, isDeliveryOrder)
             }
             //Order module end
 

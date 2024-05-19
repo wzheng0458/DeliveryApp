@@ -6,7 +6,7 @@ import com.example.deliveryapp.bookingdatabase.BookingDatabase
 import com.example.deliveryapp.deliverydatabase.AddressDatabase
 import com.example.deliveryapp.deliverydatabase.ConfirmDeliveryOrderDatabase
 import com.example.deliveryapp.logindatabase.AccountDatabase
-
+import com.example.deliveryapp.orderdatabase.OrderDatabase
 
 
 class AppApplication : Application() {
@@ -16,6 +16,8 @@ class AppApplication : Application() {
         lateinit var confirmDeliveryOrderDatabase: ConfirmDeliveryOrderDatabase
         lateinit var accountDatabase: AccountDatabase
         lateinit var bookingDatabase: BookingDatabase
+        lateinit var orderDatabase: OrderDatabase
+
 
     }
 
@@ -48,6 +50,13 @@ class AppApplication : Application() {
             applicationContext,
             BookingDatabase::class.java,
             BookingDatabase.NAME
+        )
+            .fallbackToDestructiveMigration()
+            .build()
+        orderDatabase = Room.databaseBuilder(
+            applicationContext,
+            OrderDatabase::class.java,
+            OrderDatabase.NAME
         )
             .fallbackToDestructiveMigration()
             .build()

@@ -11,7 +11,7 @@ open class ViewModel : ViewModel() {
         var ID2 =Stime.replace(Regex("[:\\sAPM]"), "").trim()
         var ID3 =Etime.replace(Regex("[:\\sAPM]"), "").trim()
         var ID4=Date.replace("/","")
-        BookingID= mutableStateOf("B$ID1$ID2$ID3$ID4")
+        BookingID= mutableStateOf("B$ID1-$ID2-$ID3-$ID4")
 
     }
 

@@ -3,38 +3,26 @@ package com.example.deliveryapp.orderdatabase
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.deliveryapp.delivery.AppApplication
+import com.example.deliveryapp.deliverydatabase.Address
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.util.Date
 
-//class OrderViewModel(private val orderRepository: OrderRepository) : ViewModel() {
-//
-//    // Function to insert an order
-//    fun insertOrder(order: Order) {
-//        viewModelScope.launch {
-//            orderRepository.insertOrder(order)
-//        }
-//    }
-//
-//    // Function to get all orders
-//    fun getAllOrders(): Flow<List<Order>> = orderRepository.getAllOrders()
-//
-//    // Function to get orders by customer ID
-//    fun getOrdersByCustomerId(customerId: String): Flow<List<Order>> = orderRepository.getOrdersByCustomerId(customerId)
-//
-//    // Function to update an order
-//    fun updateOrder(order: Order) {
-//        viewModelScope.launch {
-//            orderRepository.updateOrder(order)
-//        }
-//    }
-//
-//    // Function to delete an order
-//    fun deleteOrder(order: Order) {
-//        viewModelScope.launch {
-//            orderRepository.deleteOrder(order)
-//        }
-//    }
-//
-//    // Function to get the total number of orders for a specific product
-//    fun getOrderCountForProduct(productId: String): Flow<Int> = orderRepository.getOrderCountForProduct(productId)
-//}
+class OrderViewModel: ViewModel() {
+    val orderDao = AppApplication.orderDatabase.getOrderDao()
+
+    // Function to insert an order
+    fun insertOrder(  pId: String,
+                      oPrice: Double,
+                      oQuantity: Int ,
+                      customerId: String ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            orderDao.insert(
+                Order(pId= pId, oPrice = oPrice, oQuantity = oQuantity, customerId = customerId)
+            )
+        }
+    }
+}

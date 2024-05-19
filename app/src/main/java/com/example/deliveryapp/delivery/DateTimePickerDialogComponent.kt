@@ -191,7 +191,19 @@ fun DateTimePickerDialogComponent(
                         todayContentColor = calendarPickerMainColor,
                         todayDateBorderColor = calendarPickerMainColor
                     ),
-                    dateValidator = { it in currentDate.timeInMillis ..maxDate.timeInMillis }
+                    dateValidator = { selectedDate ->
+                        val today = Calendar.getInstance()
+                        today.set(Calendar.HOUR_OF_DAY, 0)
+                        today.set(Calendar.MINUTE, 0)
+                        today.set(Calendar.SECOND, 0)
+                        today.set(Calendar.MILLISECOND, 0)
+                        val tomorrow = Calendar.getInstance().apply { add(Calendar.DATE, 1) }
+                        tomorrow.set(Calendar.HOUR_OF_DAY, 0)
+                        tomorrow.set(Calendar.MINUTE, 0)
+                        tomorrow.set(Calendar.SECOND, 0)
+                        tomorrow.set(Calendar.MILLISECOND, 0)
+                        selectedDate in today.timeInMillis until tomorrow.timeInMillis
+                    }
                 )
             }
         }
@@ -199,15 +211,9 @@ fun DateTimePickerDialogComponent(
 }
 
 fun Long.convertMillisToDate(): String {
-    // Create a calendar instance in the default time zone
     val calendar = Calendar.getInstance().apply {
         timeInMillis = this@convertMillisToDate
-        // Adjust for the time zone offset to get the correct local date
-        val zoneOffset = get(Calendar.ZONE_OFFSET)
-        val dstOffset = get(Calendar.DST_OFFSET)
-        add(Calendar.MILLISECOND, -(zoneOffset + dstOffset))
     }
-    // Format the calendar time in the specified format
     val sdf = SimpleDateFormat("dd MMM yyyy", Locale.US)
     return sdf.format(calendar.time)
 }

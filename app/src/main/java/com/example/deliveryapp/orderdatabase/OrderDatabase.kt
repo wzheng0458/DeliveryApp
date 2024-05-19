@@ -4,28 +4,20 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.deliveryapp.bookingdatabase.Booking
+import com.example.deliveryapp.bookingdatabase.BookingDao
 
 
-//@Database(entities = [Product::class, Order::class], version = 1,exportSchema = false)
-//abstract class OrderDatabase : RoomDatabase() {
-//    abstract fun productDao(): ProductDao
-//    abstract fun orderDao(): OrderDao
-//
-//    companion object {
-//        @Volatile
-//        private var INSTANCE: OrderDatabase? = null
-//
-//        fun getDatabase(context: Context): OrderDatabase {
-//            return INSTANCE ?: synchronized(this) {
-//                val instance = Room.databaseBuilder(
-//                    context.applicationContext,
-//                    OrderDatabase::class.java,
-//                    "order_database"  // Updated to reflect the purpose
-//                ).fallbackToDestructiveMigration()  // Optional: handles migrations
-//                    .build()
-//                INSTANCE = instance
-//                instance
-//            }
-//        }
-//    }
-//}
+@Database(
+    entities = [Order::class],
+    version = 2,
+    exportSchema = false
+)
+abstract class OrderDatabase:RoomDatabase()  {
+
+    companion object {
+        const  val NAME= "Order_db"
+    }
+
+    abstract fun getOrderDao(): OrderDao
+}

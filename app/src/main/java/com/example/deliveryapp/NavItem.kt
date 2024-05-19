@@ -32,7 +32,7 @@ val listOfNavItems: List<NavItem> = listOf(
         route = Screens.BookingApp.name + "/{id}"
     ),
     NavItem(
-        label = "DeliveryInfoUI",
+        label = "Delivery",
         icon = Icons.Filled.DeliveryDining,
         route = Screens.DeliveryInfoUI.name + "/{id}",
     )

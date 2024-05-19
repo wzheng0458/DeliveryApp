@@ -11,9 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.room.Room
-import com.example.deliveryapp.login.AccountViewModel
-import com.example.deliveryapp.logindatabase.AccountDatabase
+
 import com.example.deliveryapp.orderdatabase.ProductDatabase
 import com.example.deliveryapp.ui.theme.DeliveryAppTheme
 import kotlinx.coroutines.Dispatchers

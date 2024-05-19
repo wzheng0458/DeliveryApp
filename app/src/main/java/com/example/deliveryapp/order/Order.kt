@@ -34,7 +34,6 @@ fun Order(navController: NavHostController, category: String, cartViewModel: Car
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val productDao = ProductDatabase.getDatabase(navController.context).productDao()
     val products by productDao.getProductsByCategory(category).collectAsState(initial = emptyList())
-
     var snackbarMessage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
 

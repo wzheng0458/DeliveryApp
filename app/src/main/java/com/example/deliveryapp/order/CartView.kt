@@ -102,6 +102,7 @@ fun CartView(
                         scope.launch {
                             // Remove products with zero quantity
                             cartViewModel.removeZeroQuantityProducts()
+
                             // Navigate to Bill screen
                             navController.navigate(Screens.Bill.name + "/${id}/${isDeliveryOrder}")
                         }

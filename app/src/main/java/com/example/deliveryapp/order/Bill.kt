@@ -13,8 +13,8 @@ import com.example.deliveryapp.R
 import com.example.deliveryapp.Screens
 import com.example.deliveryapp.delivery.ConfirmDeliveryOrderViewModel
 import com.example.deliveryapp.orderdatabase.CartViewModel
-//import com.example.deliveryapp.orderdatabase.OrderViewModel
-//import com.example.deliveryapp.orderdatabase.Order
+import com.example.deliveryapp.orderdatabase.OrderViewModel
+import com.example.deliveryapp.orderdatabase.Order
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 
@@ -22,9 +22,7 @@ import java.text.DecimalFormat
 fun Bill(
     cartViewModel: CartViewModel,
     navController: NavHostController,
-//    orderViewModel: OrderViewModel,
-    //customerId: String, // Customer ID
-    //tableNumber: Int, // Table number
+    orderViewModel: OrderViewModel,
     id: String,
     confirmDeliveryOrderViewModel: ConfirmDeliveryOrderViewModel,
     isDeliveryOrder: Int?
@@ -38,8 +36,8 @@ fun Bill(
     val decimalFormat = DecimalFormat("#.##")
     val scope = rememberCoroutineScope()
 
-    val customerId = id
-    val tableNumber = "T1"
+
+
 
     Column(
         modifier = Modifier
@@ -60,11 +58,8 @@ fun Bill(
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text(text = "Customer ID: $customerId", style = MaterialTheme.typography.bodyMedium)
-        if (isDeliveryOrder == 0){
-            Text(text = "Table Number: $tableNumber", style = MaterialTheme.typography.bodyMedium)
+        Text(text = "Customer ID: $id", style = MaterialTheme.typography.bodyMedium)
 
-        }
         Spacer(modifier = Modifier.height(8.dp))
 
         products.forEach { product ->
@@ -89,18 +84,17 @@ fun Bill(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
-//            scope.launch {
-//                // Insert each product as a separate order
-//                products.forEach { product ->
-//                    val order = Order(
-//                        pId = product.pId,
-//                        oPrice = product.pPrice,
-//                        oQuantity = product.pQuantity,
-//                        oTable = tableNumber,
-//                        customerId = customerId
-//                    )
-//                    orderViewModel.insertOrder(order)
-//                }
+            scope.launch {
+                // Insert each product as a separate order
+                products.forEach { product ->
+                    val order = Order(
+                        pId = product.pId,
+                        oPrice = product.pPrice,
+                        oQuantity = product.pQuantity,
+                        customerId = id
+                    )
+                    orderViewModel.insertOrder(order.pId, order.oPrice, order.oQuantity, order.customerId)
+                }
                 // Clear the cart
                 cartViewModel.clearCart()
                 // Navigate back to menu
@@ -108,7 +102,7 @@ fun Bill(
                 navController.navigate(Screens.OrderMenu.name + "/${id} " + "/${isDeliveryOrder}")
 
 
-//            }
+            }
         }) {
             Text(text = "Done")
         }
