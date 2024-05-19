@@ -26,8 +26,8 @@ fun DeliveryInfoUI(
     navController: NavController,
     addressViewModel: AddressViewModel,
     confirmDeliveryOrderViewModel: ConfirmDeliveryOrderViewModel,
-    id: String?
-) {
+    id: String?,
+    ) {
     var selectedTabIndex by remember {
         mutableIntStateOf(0)
     }
@@ -75,7 +75,7 @@ fun DeliveryInfoUI(
                     AddressListComponent(navController = navController, addressViewModel, confirmDeliveryOrderViewModel,id, selectedDate, selectedTime)
                 }
                 1 -> {
-                    DeliveryRecord(navController ,confirmDeliveryOrderViewModel = confirmDeliveryOrderViewModel, id = id)
+                    DeliveryRecord(navController ,confirmDeliveryOrderViewModel = confirmDeliveryOrderViewModel, id )
 
                 }
 

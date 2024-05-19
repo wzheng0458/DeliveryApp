@@ -41,15 +41,19 @@ import java.util.Locale
 fun DateTimePickerDialogComponent(
     onDateSelected: (String) -> Unit,
     onTimeSelected: (String) -> Unit
-){
+) {
     val currentDate = Calendar.getInstance().apply { timeInMillis = System.currentTimeMillis() }
-    val maxDate = Calendar.getInstance().apply { add(Calendar.DATE, 2) }
+    val maxDate = Calendar.getInstance().apply { add(Calendar.DATE, 3) }
+
     // Initial state setup for the DatePickerDialog. Specifies to show the picker initially
     val datePickerState = rememberDatePickerState(initialDisplayMode = DisplayMode.Picker)
+
     // State to hold the selected date as a String
     val selectedDateLabel = remember { mutableStateOf("") }
+
     // State to control the visibility of the DatePickerDialog
     val openDateDialog = remember { mutableStateOf(false) }
+
     // Define the main color for the calendar picker
     val calendarPickerMainColor = Color(0xFF722276)
     val cal = Calendar.getInstance()
@@ -57,11 +61,10 @@ fun DateTimePickerDialogComponent(
     val minute = cal.get(Calendar.MINUTE)
 
     val context = LocalContext.current
-    var time by remember {
-        mutableStateOf("")
-    }
+    var time by remember { mutableStateOf("") }
+
     val timePickerDialog = TimePickerDialog(
-        context,{ t, hoursOfDay, minutes ->
+        context, { _, hoursOfDay, minutes ->
             val selectedTime = Calendar.getInstance().apply {
                 set(Calendar.HOUR_OF_DAY, hoursOfDay)
                 set(Calendar.MINUTE, minutes)
@@ -76,60 +79,75 @@ fun DateTimePickerDialogComponent(
             }
         }, hour, minute, false
     )
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Text(
-            text = "When?",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
         Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-                .clickable { openDateDialog.value = true },
+                .fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
             elevation = CardDefaults.cardElevation(18.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFA500))
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFE0B2))
         ) {
-            Row(
-                modifier = Modifier.padding(16.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.DateRange,
-                    contentDescription = "Date Picker"
-                )
                 Text(
-                    text = "Date: ${selectedDateLabel.value}",
-                    modifier = Modifier.padding(start = 8.dp)
+                    text = "When?",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
-            }
-        }
 
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-                .clickable { timePickerDialog.show() },
-            shape = RoundedCornerShape(8.dp),
-            elevation = CardDefaults.cardElevation(18.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFA500))
-        ) {
-            Row(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.AccessTime,
-                    contentDescription = "Time Picker"
-                )
-                Text(
-                    text = "Time: ${time}",
-                    modifier = Modifier.padding(start = 8.dp)
-                )
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                        .clickable { openDateDialog.value = true },
+                    shape = RoundedCornerShape(8.dp),
+                    elevation = CardDefaults.cardElevation(18.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFA500))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Date Picker"
+                        )
+                        Text(
+                            text = "Date: ${selectedDateLabel.value}",
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+                }
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                        .clickable { timePickerDialog.show() },
+                    shape = RoundedCornerShape(8.dp),
+                    elevation = CardDefaults.cardElevation(18.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFA500))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AccessTime,
+                            contentDescription = "Time Picker"
+                        )
+                        Text(
+                            text = "Time: $time",
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+                }
             }
         }
 
@@ -173,8 +191,7 @@ fun DateTimePickerDialogComponent(
                         todayContentColor = calendarPickerMainColor,
                         todayDateBorderColor = calendarPickerMainColor
                     ),
-                    dateValidator = { it in currentDate.timeInMillis..maxDate.timeInMillis }
-
+                    dateValidator = { it in currentDate.timeInMillis ..maxDate.timeInMillis }
                 )
             }
         }

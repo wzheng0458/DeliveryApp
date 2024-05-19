@@ -8,6 +8,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -30,10 +33,16 @@ import com.example.deliveryapp.login.LoginMainScreen
 import com.example.deliveryapp.login.LoginViewModel
 import com.example.deliveryapp.login.ViewAccountScreen
 import com.example.deliveryapp.logindatabase.AccountState
+import com.example.deliveryapp.order.Bill
+import com.example.deliveryapp.order.CartView
+import com.example.deliveryapp.order.Order
+import com.example.deliveryapp.order.OrderMenu
+import com.example.deliveryapp.orderdatabase.CartViewModel
+//import com.example.deliveryapp.orderdatabase.OrderViewModel
 import com.example.loginapp.RegisterScreen
 import com.example.loginapp.StaffMainScreen
-
 import com.example.loginapp.ui.theme.RegisterViewModel
+
 
 
 @Composable
@@ -41,15 +50,18 @@ fun NavigationController(){
     val navController = rememberNavController()
     val addressViewModel = AddressViewModel()
     val confirmDeliveryOrderViewModel = ConfirmDeliveryOrderViewModel()
+    val cartViewModel = viewModel<CartViewModel>()
+
+//    val orderViewModel = viewModel<OrderViewModel>()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     Scaffold (
         bottomBar = {
             if (currentDestination?.route != Screens.LoginMainScreen.name &&
                 currentDestination?.route != Screens.RegisterScreen.name &&
-                currentDestination?.route != Screens.StaffMainScreen.name &&
-                currentDestination?.route != Screens.ViewAccountScreen.name &&
-                currentDestination?.route != Screens.StaffMainScreen.name) {
+                currentDestination?.route != Screens.StaffMainScreen.name+ "/{staffId}" &&
+                currentDestination?.route != Screens.ViewAccountScreen.name
+                ) {
                 NavigationBar {
                     listOfNavItems.forEach { navItem ->
                         NavigationBarItem(
@@ -121,6 +133,7 @@ fun NavigationController(){
 
             composable(route = Screens.DeliveryInfoUI.name + "/{id}" ) {
                 val id = it.arguments?.getString("id")
+
                 DeliveryInfoUI(navController, addressViewModel, confirmDeliveryOrderViewModel, id)
             }
             composable(route = Screens.MapScreenComponent.name + "/{id}" + "/{custId}") {
@@ -134,6 +147,8 @@ fun NavigationController(){
             }
             composable(route = Screens.DeliveryRecord.name + "/{id}" ) {
                 val id = it.arguments?.getString("id")
+
+
                 DeliveryRecord(navController ,confirmDeliveryOrderViewModel, id)
             }
             //delivery module end
@@ -147,8 +162,50 @@ fun NavigationController(){
                 val id = it.arguments?.getString("id")
                 BookingApp(navController, id)
             }
-
             //Booking module end
+
+            //Order module start
+            composable(route = Screens.OrderMenu.name + "/{id}" ) {
+                val id = it.arguments?.getString("id")
+
+
+                OrderMenu(navController, id, 0)
+
+            }
+            //if i navigate from delivery module
+            composable(route = Screens.OrderMenu.name + "/{id}/{isDeliveryOrder}" ) {
+                val id = it.arguments?.getString("id")
+                var isDeliveryOrder = it.arguments?.getString("isDeliveryOrder")?.toInt()
+                if (isDeliveryOrder == 1){
+                    isDeliveryOrder = 1
+                }else
+                    isDeliveryOrder = 0
+
+                OrderMenu(navController, id, isDeliveryOrder)
+
+            }
+            composable(route = Screens.Order.name + "/{category}/{id}/{isDeliveryOrder}" ) {
+                val category = it.arguments?.getString("category") ?: ""
+                val id = it.arguments?.getString("id") ?: ""
+                var isDeliveryOrder = it.arguments?.getString("isDeliveryOrder")?.toInt()
+
+
+                Order(navController, category, cartViewModel, id, isDeliveryOrder)
+            }
+            composable(route = Screens.CartView.name + "/{id}/{isDeliveryOrder}") {
+                val id = it.arguments?.getString("id") ?: ""
+                var isDeliveryOrder = it.arguments?.getString("isDeliveryOrder")?.toInt()
+
+
+                CartView(navController, cartViewModel, id, isDeliveryOrder)
+            }
+            composable(route = Screens.Bill.name + "/{id}/{isDeliveryOrder}" ) {
+                val id = it.arguments?.getString("id") ?: ""
+                var isDeliveryOrder = it.arguments?.getString("isDeliveryOrder")?.toInt()
+
+                Bill(cartViewModel, navController, id, confirmDeliveryOrderViewModel, isDeliveryOrder)
+            }
+            //Order module end
 
 
         }

@@ -24,7 +24,7 @@ val listOfNavItems: List<NavItem> = listOf(
     NavItem(
         label = "Order",
         icon = Icons.Default.Restaurant,
-        route = Screens.CustomerMainScreen.name + "/{custId}"
+        route = Screens.OrderMenu.name + "/{id}"
     ),
     NavItem(
         label = "Booking",

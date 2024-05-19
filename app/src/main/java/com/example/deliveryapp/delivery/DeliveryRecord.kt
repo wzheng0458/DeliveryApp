@@ -23,8 +23,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,7 +51,8 @@ fun DeliveryRecord(navController: NavController,confirmDeliveryOrderViewModel: C
                 navController,
                 order,
                 confirmDeliveryOrderViewModel,
-                order.id
+                order.id,
+
             )
         }
     }
@@ -55,14 +61,21 @@ fun DeliveryRecord(navController: NavController,confirmDeliveryOrderViewModel: C
 @Composable
 fun DeliveryOrderItem(navController: NavController ,order: ConfirmDeliveryOrder, confirmDeliveryOrderViewModel: ConfirmDeliveryOrderViewModel, index: Int?){
     val context = LocalContext.current
+    var isDeliveryOrder by remember {
+        mutableIntStateOf(0)
+    }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { /*navigate to order*/ },
+            .clickable {
+                isDeliveryOrder = 1
+                navController.navigate(Screens.OrderMenu.name + "/${order.id}/${isDeliveryOrder}")
+            },
         shape = RoundedCornerShape(2.dp),
-        elevation = CardDefaults.cardElevation(10.dp)
+        elevation = CardDefaults.cardElevation(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFA500))
 
 
     ) {
@@ -102,7 +115,7 @@ fun DeliveryOrderItem(navController: NavController ,order: ConfirmDeliveryOrder,
                     onClick = {
                         index?.let {
                             confirmDeliveryOrderViewModel.deleteOrder(index)
-                            navController.navigate(Screens.DeliveryInfoUI.name + "/${order.id}")
+                            navController.navigate(Screens.DeliveryInfoUI.name + "/${order.id}/${isDeliveryOrder}")
                             Toast.makeText(context, "Successfully", Toast.LENGTH_LONG).show()
                         }
                     }

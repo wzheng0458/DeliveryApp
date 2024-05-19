@@ -192,7 +192,8 @@ fun AddressItem(
             .fillMaxWidth()
             .padding(8.dp),
         shape = RoundedCornerShape(2.dp),
-        elevation = CardDefaults.cardElevation(10.dp)
+        elevation = CardDefaults.cardElevation(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFA500))
 
     ) {
         Row(

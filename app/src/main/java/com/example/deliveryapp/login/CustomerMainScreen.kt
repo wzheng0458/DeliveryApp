@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -48,34 +49,38 @@ fun CustomerMainScreen(navController: NavController, custId: String?) {
             FoodPromoDisplay()
         }
 
-        // Row to contain the button at the top right
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            horizontalArrangement = Arrangement.End
-        ) {
-            Button(
-                onClick = { navController.navigate(Screens.LoginMainScreen.name) }
+
+            // Row to contain the button at the bottom
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.padding(vertical = 10.dp)
+                Button(
+                    onClick = { navController.navigate(Screens.LoginMainScreen.name) }
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.logout),
-                        contentDescription = "Logout",
-                        modifier = Modifier.size(48.dp)
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(
-                        text = "Log out",
-                        fontSize = 20.sp
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(vertical = 10.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.logout),
+                            contentDescription = "Logout",
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "Log out",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
-        }
+
     }
 }
 
@@ -113,11 +118,6 @@ fun FoodPromoCard(foodPromo: FoodPromoData, modifier: Modifier = Modifier) {
                 contentDescription = null, // Add content description if needed
                 contentScale = ContentScale.Crop
             )
-            Button(onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(Color(0xFFFFA500)),
-                modifier = Modifier.align(Alignment.CenterHorizontally)){
-                Text(text = "Order Now")
-            }
         }
     }
 }

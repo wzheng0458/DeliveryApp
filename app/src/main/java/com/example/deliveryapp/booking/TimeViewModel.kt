@@ -29,6 +29,8 @@ class TimeViewModel : ViewModel() {
         val EndRange = LocalTime.of(22, 0)
 
 
+
+
         if (Stime.isNullOrBlank() || Etime.isNullOrBlank() || Date.isNullOrBlank()) {
             return valid
         } else {
@@ -36,9 +38,7 @@ class TimeViewModel : ViewModel() {
             val Start = LocalTime.parse(Stime, formatter)
             val End = LocalTime.parse(Etime, formatter)
             val duration = Duration.between(Start, End)
-            val minute = duration.toMinutes()
-            val isWithinrangeStart = Start in StartRange..EndRange
-            val isWithinrangeEnd = End in StartRange..EndRange
+            val minutes = duration.toMinutes()
 
             //date variable
 
@@ -47,25 +47,19 @@ class TimeViewModel : ViewModel() {
             val month = parts[1].toIntOrNull()
             val day = parts[0].toIntOrNull()
 
-            if (isWithinrangeStart && isWithinrangeEnd) {
-                if (minute < 30 || minute > 120) {
 
-                    valid = 2
-                    /*set maximum and minimum time*/
-                } else {
-                    //the booking time must be late 30 minutes than current time
-                    if (month == currentMonth && day == currentDay) {
-                        if (Start.isBefore(currentTime.plusMinutes(31))) {
-                            valid = 1
-                        } else {
-                            valid = 0
-                        }
-                    }
+            if (Start.isBefore(StartRange) || Start.isAfter(EndRange) || End.isAfter(EndRange)||End.isBefore(StartRange)) {
+
+                valid = 3
+            } else if (minutes !in 30..120) {
+                valid = 2
+            } else if (month == currentMonth && day == currentDay) {
+                if (Start.isBefore(currentTime.plusMinutes(31))) {
+                    valid = 1
                 }
-            }else{
-                valid=3
             }
         }
+
         return valid
     }
 

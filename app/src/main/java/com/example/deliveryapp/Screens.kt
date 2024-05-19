@@ -1,5 +1,6 @@
 package com.example.deliveryapp
 
+
 enum class Screens {
     //delivery module screens
     DeliveryInfoUI,
@@ -15,5 +16,10 @@ enum class Screens {
     ViewAccountScreen ,
     //Booking module screens
     BookingScreen,
-    BookingApp
+    BookingApp,
+    //Order module screens
+    OrderMenu,
+    Order,
+    CartView,
+    Bill
 }
