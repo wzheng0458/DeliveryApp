@@ -87,7 +87,7 @@ fun OrderMenu(navController: NavHostController, id: String?, isDeliveryOrder: In
         ) {
             items(listOf("Breakfast", "Chinese Food", "Malaysia Food", "Western", "Snack", "Beverage")) { category ->
                 MenuCategoryCard(category) {
-                    navController.navigate("${Screens.Order.name}/$category/$id/$isDeliveryOrder")
+                    navController.navigate(Screens.Order.name +"/$category/$id/$isDeliveryOrder")
                 }
             }
         }

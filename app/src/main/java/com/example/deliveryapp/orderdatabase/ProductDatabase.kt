@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase
 import com.example.deliveryapp.R
 
 
-@Database(entities = [Product::class], version = 2, exportSchema = false)
+@Database(entities = [Product::class], version = 3, exportSchema = false)
 abstract class ProductDatabase : RoomDatabase() {
 
     abstract fun productDao(): ProductDao
@@ -24,7 +24,9 @@ abstract class ProductDatabase : RoomDatabase() {
                     context.applicationContext,
                     ProductDatabase::class.java,
                     "product_database"
-                ).build().also { INSTANCE = it }
+                )
+                    .fallbackToDestructiveMigration()
+                    .build().also { INSTANCE = it }
             }
         }
 

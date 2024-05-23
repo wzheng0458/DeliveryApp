@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch(Dispatchers.IO) {
-            ProductDatabase.insertSampleProducts(this@MainActivity)
+//            ProductDatabase.insertSampleProducts(this@MainActivity)
         }
         setContent {
             DeliveryAppTheme {
