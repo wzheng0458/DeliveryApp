@@ -157,7 +157,7 @@ fun AddressListComponent(navController: NavController, addressViewModel: Address
                 showDialogConfirm.value = false
                 selectedAddress?.let {
                     confirmDeliveryOrderViewModel.insertOrder(selectedAddress, selectedDate, selectedTime)
-                    navController.navigate(route = Screens.DeliveryRecord.name + "/${id}")
+//                    navController.navigate(route = Screens.DeliveryRecord.name + "/${id}")
                     Toast.makeText(context, "Successfully", Toast.LENGTH_LONG).show()
                 }
 

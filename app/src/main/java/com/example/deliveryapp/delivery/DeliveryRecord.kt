@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -40,6 +41,8 @@ import com.example.deliveryapp.deliverydatabase.ConfirmDeliveryOrder
 @Composable
 fun DeliveryRecord(navController: NavController,confirmDeliveryOrderViewModel: ConfirmDeliveryOrderViewModel, id: String?){
     val deliveryOrder by confirmDeliveryOrderViewModel.getListOrderById(id ?: "").observeAsState(emptyList())
+
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -64,6 +67,7 @@ fun DeliveryOrderItem(navController: NavController ,order: ConfirmDeliveryOrder,
     var isDeliveryOrder by remember {
         mutableIntStateOf(0)
     }
+    val showDialogDelete = remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
@@ -114,9 +118,7 @@ fun DeliveryOrderItem(navController: NavController ,order: ConfirmDeliveryOrder,
                 IconButton(
                     onClick = {
                         index?.let {
-                            confirmDeliveryOrderViewModel.deleteOrder(index)
-                            navController.navigate(Screens.DeliveryInfoUI.name + "/${order.id}/${isDeliveryOrder}")
-                            Toast.makeText(context, "Successfully", Toast.LENGTH_LONG).show()
+                            showDialogDelete.value = true
                         }
                     }
                 ) {
@@ -128,6 +130,24 @@ fun DeliveryOrderItem(navController: NavController ,order: ConfirmDeliveryOrder,
                 }
             }
         }
+    }
+    if (showDialogDelete.value) {
+        AlertDialogBox(
+            onDismissRequest = { showDialogDelete.value = false },
+            onConfirmation = {
+                index?.let {
+                    showDialogDelete.value = false
+
+                    confirmDeliveryOrderViewModel.deleteOrder(index)
+//                            navController.navigate(Screens.DeliveryInfoUI.name + "/${order.id}/${isDeliveryOrder}")
+                    Toast.makeText(context, "Successfully", Toast.LENGTH_LONG).show()
+                }
+
+            },
+            dialogTitle = "Confirmation",
+            dialogText = "Are you sure?",
+            dialogIcon = Icons.Default.Person
+        )
     }
 }
 
